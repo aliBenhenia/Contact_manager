@@ -1,5 +1,14 @@
 {
-    "contacts":[
-        
-    ]
+  "contacts": [
+    {
+      "id": "1",
+      "username": "isaam",
+      "contact_email": "issam11@gmail.com"
+    },
+    {
+      "id": "cebe",
+      "username": "folp",
+      "contact_email": "rttt"
+    }
+  ]
 }

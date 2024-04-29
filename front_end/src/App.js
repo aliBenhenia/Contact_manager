@@ -3,6 +3,7 @@ import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import Contact from './Contact';
+import axios from 'axios';
 
 import { useState , useEffect} from 'react';
 
@@ -39,26 +40,61 @@ const data1 = [
 
 function App() {
   const savedData = JSON.parse(localStorage.getItem('dataStorage'));
-  const [data, setData] = useState(savedData);
+  const [data, setData] = useState([]);
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   useEffect(()=>{
-     localStorage.setItem("dataStorage", JSON.stringify(data));
-  },[data])
+    //  localStorage.setItem("dataStorage", JSON.stringify(data));
+    fetch('http://localhost:3006/contacts')
+            .then(response => {
+                // Check if the response is successful
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                // Parse the JSON response
+                return response.json();
+            })
+            .then(data => {
+                // Set the fetched data in state
+                setData(data);
+                // Set loading state to false
+                // setLoading(false);
+            })
+            .catch(error => {
+                // Log and handle errors
+                console.error('Error fetching data:', error);
+                // Set loading state to false
+                // setLoading(false);
+            });
+  },[])
   const handle_add = ()=>{
-    let flag = 1;
-    if (name.length == 0 || contact.length == 0)
-      flag = 0;
-    data.map((iter)=>{
-      if (iter.username == name)
-      {
-        flag = 0;
-        return;
-      }
-    })
-    if (flag)
-      setData([...data, {username:name, contact_email:contact}]);
+    // let flag = 1;
+    // if (name.length == 0 || contact.length == 0)
+    //   flag = 0;
+    // data.map((iter)=>{
+    //   if (iter.username == name)
+    //   {
+    //     flag = 0;
+    //     return;
+    //   }
+    // })
+    // if (flag)
+    //   setData([...data, {username:name, contact_email:contact}]);
+    try {
+      // Make a POST request to the API endpoint using Axios
+      const response =  axios.post('http://localhost:3006/contacts', {
+          username:name,
+          contact_email: contact,
+      });
 
+      // Reset input fields after successful submission
+      
+      // alert('Data submitted successfully!');
+  } catch (error) {
+      console.error('Error submitting data:', error);
+      alert('Failed to submit data. Please try again later.');
+  }
+    
   }
   const handle_delete = (item)=>{
     const newdata = data.filter((el)=> el.username != item.username);
