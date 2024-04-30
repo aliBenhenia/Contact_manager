@@ -6,6 +6,7 @@ import Contact from './Contact';
 import axios from 'axios';
 
 import { useState , useEffect} from 'react';
+import useFeatch from './FetchData';
 
 const data1 = [
   {
@@ -39,13 +40,15 @@ const data1 = [
 ]
 
 function App() {
-  const savedData = JSON.parse(localStorage.getItem('dataStorage'));
+  const url = 'http://localhost:3006/contacts';
+  // const savedData = JSON.parse(localStorage.getItem('dataStorage'));
   const [data, setData] = useState([]);
+  // const [data] = useFeatch(url);
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   useEffect(()=>{
     //  localStorage.setItem("dataStorage", JSON.stringify(data));
-    fetch('http://localhost:3006/contacts')
+    fetch(url)
             .then(response => {
                 // Check if the response is successful
                 if (!response.ok) {
@@ -66,7 +69,8 @@ function App() {
                 // Set loading state to false
                 // setLoading(false);
             });
-  },[])
+    
+  },[data])
   const handle_add = ()=>{
     // let flag = 1;
     // if (name.length == 0 || contact.length == 0)
@@ -96,20 +100,50 @@ function App() {
   }
     
   }
-  const handle_delete = (item)=>{
-    const newdata = data.filter((el)=> el.username != item.username);
-    setData(newdata);
+  const handle_delete = (idx)=>{
+    // const newdata = data.filter((el)=> el.username != item.username);
+    // setData(newdata);
+    try {
+      // Make a DELETE request to the API endpoint with the ID of the data to be deleted
+      // idx++;
+      const response =  axios.delete('http://localhost:3006/contacts'+'/'+idx);
+  
+      // If the request is successful, you can handle the response here
+      console.log('Data deleted successfully');
+      return response.data; // Return any response data if needed
+    } catch (error) {
+      // If there's an error, handle it here
+      console.error('Error deleting data:', error.message);
+      throw error; // Re-throw the error to handle it at the caller's level
+    }
   }
   const handle_update = (idx)=>{
-    data.map((el, index)=>{
-      if (index == idx)
-      {
-        const newData = data.map(iter=> iter);
-        newData[idx].username = name;
-        newData[idx].contact_email = contact;
-        setData(newData);
-      }
-    })
+    // data.map((el, index)=>{
+    //   if (index == idx)
+    //   {
+    //     const newData = data.map(iter=> iter);
+    //     newData[idx].username = name;
+    //     newData[idx].contact_email = contact;
+    //     setData(newData);
+    //   }
+    // })
+    try {
+      // Make a POST request to the API endpoint using Axios
+      idx++;
+      const response =  axios.put('http://localhost:3006/contacts'+'/'+idx, {
+          id : idx+1,
+          username:name,
+          contact_email: contact,
+      });
+
+      // Reset input fields after successful submission
+      
+      // alert('Data submitted successfully!');
+  } catch (error) {
+      console.error('Error submitting data:', error);
+      alert('Failed to submit data. Please try again later.');
+  }
+
   }
   return (
     <div className="App container" >
@@ -141,7 +175,7 @@ function App() {
                 <div className='col-6'>
                     <div className="btn-group float-end" role="group" aria-label="Basic example">
                     <button type="button" onClick={()=>handle_update(idx)} className="btn btn-primary">update</button>
-                    <button type="button" onClick={()=>handle_delete(item)} className="btn btn-danger ml-4">delete</button>
+                    <button type="button" onClick={()=>handle_delete(idx)} className="btn btn-danger ml-4">delete</button>
                     </div>
                 </div>
               </div>
